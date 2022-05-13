@@ -1,0 +1,9 @@
+{
+  "Parameters": {
+    "AccountIdTooling": "",
+    "CodePipelineDeploymentArn": "",
+    "ModelPackageGroupDescription": "Model package group used for the project",
+    "ModelPackageGroupName": "mlops-iot-package-group",
+    "S3BucketName": ""
+  }
+}

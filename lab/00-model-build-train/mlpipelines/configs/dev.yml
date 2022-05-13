@@ -1,0 +1,31 @@
+train:
+    region:
+    role:
+    model_package_group_name: mlops-iot-package-group
+    preprocessing_framework_version: 0.23-1
+    preprocessing_instance_count: ml.m5.xlarge
+    preprocessing_instance_type: 1
+    preprocessing_input_files_path: data/input
+    preprocessing_entrypoint: ./../../algorithms/preprocessing/preprocessing.py
+    postprocessing_output_files_path: data/output
+    training_framework_version: 1.6.0
+    training_python_version: py3
+    training_instance_count: 1
+    training_instance_type: ml.c5.4xlarge
+    training_entrypoint: ./../../algorithms/training/wind_turbine.py
+    transform_instance_count: 2
+    transform_instance_type: ml.c5.xlarge
+    s3_bucket_name: 
+    training_hyperparameters:
+        k_fold_splits: 6
+        k_index_only: 3
+        num_epochs: 20
+        batch_size: 256
+        learning_rate: 0.0001
+        dropout_rate: 0.001
+    training_metrics:
+        - Name: train_loss:mse
+          Regex:  train_loss=(\S+);
+        - Name: test_loss:mse
+          Regex:  test_loss=(\S+);
+    pipeline_name: MLOpsIotBuildTrain
