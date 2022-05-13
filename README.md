@@ -27,9 +27,9 @@ SageMaker Jobs. *Optional parameters*:
    1. *SecurityGroupId*: Provide a Security Group for studio if you want to use your own networking setup, otherwise the parameter
    is read by using AWS SSM after the deployment of the template [00-networking](./infrastructure_templates/00-networking/template.yml)
    2. *SubnetId*: Provide a Subnet (Public or Private) for studio if you want to use your own networking setup, otherwise the parameter
-   is read by using AWS SSM after the deployment of the template [00-networking](./infrastructure_templates/00-networking/template.
+   is read by using AWS SSM after the deployment of the template [00-networking](./infrastructure_templates/00-networking/template).
    3. *VpcId*: Provide a Vpc ID for studio if you want to use your own networking setup, otherwise the parameter is read by 
-   using AWS SSM after the deployment of the template [00-networking](./infrastructure_templates/00-networking/template.
+   using AWS SSM after the deployment of the template [00-networking](./infrastructure_templates/00-networking/template).
 3. [02-ci-cd](./infrastructure_templates/02-ci-cd/template.yml): This template is creating the CI/CD pipelines using 
 [AWS CodeBuild](https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html) and [AWS CodePipeline](https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html).
 It creates two CI/CD pipelines, linked to two AWS CodeCommit repositories, one for training and one for deployment, that can 
