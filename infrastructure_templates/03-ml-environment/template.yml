@@ -274,3 +274,11 @@ Resources:
           RoleArn: !GetAtt
             - EventBridgeRole
             - Arn
+
+  S3BucketMLSSM:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /s3/bucket/ml
+      Tier: Standard
+      Type: String
+      Value: !Ref S3BucketML

@@ -1,6 +1,6 @@
 train:
-    region:
-    role:
+    region: eu-west-1
+    role: arn:aws:iam::015770912575:role/mlops-sagemaker-execution-role
     model_package_group_name: mlops-iot-package-group
     preprocessing_framework_version: 0.23-1
     preprocessing_instance_count: ml.m5.xlarge
@@ -15,7 +15,7 @@ train:
     training_entrypoint: ./../../algorithms/training/wind_turbine.py
     transform_instance_count: 2
     transform_instance_type: ml.c5.xlarge
-    s3_bucket_name: 
+    s3_bucket_name:
     training_hyperparameters:
         k_fold_splits: 6
         k_index_only: 3

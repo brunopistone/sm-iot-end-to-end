@@ -1,0 +1,8 @@
+{
+  "Parameters": {
+    "DeviceFleetSuffix": "fleet-1",
+    "SageMakerStudioRoleName": "",
+    "S3BucketML": "",
+    "ThingGroupName": "wind-ec2-fleet"
+  }
+}

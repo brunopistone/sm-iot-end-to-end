@@ -1,0 +1,12 @@
+inference:
+    region: us-east-1
+    role:
+    deployment_configs:
+        ComponentName: mlops-iot-regressor
+        PlatformOS: LINUX
+        PlatformArchitecture: X86_64
+    lambdas:
+        get-last-approved-model:
+        create-packaging-job:
+        check-packaging-job:
+    s3_bucket_name: isengard-bpistone-mlops-iot-dev
