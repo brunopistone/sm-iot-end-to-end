@@ -24,7 +24,7 @@ class WindTurbineFarmSimulator(object):
     def __init__(self, n_turbines=5):
         self.n_turbines = n_turbines
         # read the raw data. This data was captured from real sensors installed in the mini Wind Turbine
-        self.raw_data = pd.read_csv(os.path.join(os.path.dirname(__file__), '../data/dataset_wind.csv.gz'), compression="gzip", sep=',', low_memory=False).values
+        self.raw_data = pd.read_csv(os.path.join(os.path.dirname(__file__), './../data/dataset_wind_turbine.csv.gz'), compression="gzip", sep=',', low_memory=False).values
         
         self.mqtt_client=mqttclient.Client(client_id='simulator')
         self.mqtt_client.connect()

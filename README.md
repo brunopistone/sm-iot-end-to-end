@@ -42,6 +42,10 @@ be triggered through pushes on the main branch or with the automation part deplo
 ML workflow, such as Amazon S3 bucket for storing code and model artifacts, [Amazon SageMaker Model Registry](https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry.html) 
 for versioning trained ML models, and [Amazon EventBridge Rule](https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rules.html) 
 for monitoring updates in the SageMaker Model Registry and start the CI/CD pipeline for deploying ML models in the production environments.
+5. [04-ec2-device-fleet](./infrastructure_templates/04-ec2-device-fleet/template.yml): This template is creating the necessary resources for 
+a cloud digital twin, such as EC2 instances, SageMaker Edge Manager Device Fleet, IoT Policies and Roles. *Optional parameters*:
+   1. SageMakerStudioRoleName: IAM Role used by SageMaker. If you deployed the entire stack, this value is taken through SSM
+   2. S3BucketML: S3 Bucket used for ML purposes. If you deployed the entire stack, this value is taken through SSM
 
 ## Labs
 

@@ -9,6 +9,7 @@ Profile and the Simulated edge environment
 2. 01-sagemaker-studio-environment
 3. 02-ci-cd
 4. 03-ml-environment
+5. 04-ec2-device-fleet
 
 ### Script buildspec.sh
 
@@ -44,4 +45,10 @@ Parameters:
 
 ```
 ./buildspec.sh 03-ml-environment test-bucket
+```
+
+#### EC2 device fleet
+
+```
+./buildspec.sh 04-ec2-device-fleet test-bucket
 ```

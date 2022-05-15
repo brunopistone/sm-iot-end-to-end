@@ -31,8 +31,8 @@ class WindTurbine(object):
         self.halted = False # if True you can't use this turbine anymore. create a new one.
 
         # components of the UI
-        self.stopped_img = open('../../imgs/wind_turbine.png', 'rb').read()
-        self.running_img = open('../../imgs/wind_turbine.gif', 'rb').read()
+        self.stopped_img = open('../imgs/wind_turbine.png', 'rb').read()
+        self.running_img = open('../imgs/wind_turbine.gif', 'rb').read()
         self.button = widgets.Button(description='Start (Id: %d)' % self.turbine_id)
         self.button.on_click(self.__on_button_clicked__)
         

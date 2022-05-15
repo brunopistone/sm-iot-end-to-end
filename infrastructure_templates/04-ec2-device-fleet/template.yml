@@ -422,23 +422,28 @@ Resources:
               - iot:Publish
               - iot:Receive
             Resource:
-              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/wind-turbine/*"
+              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/*"
+              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/*/*"
               - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/$aws/*"
-              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:wind-turbine/*"
+              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:*"
+              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:*/*"
           - Effect: Allow
             Action:
               - iot:Subscribe
             Resource:
-              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topicfilter/wind-turbine/*"
+              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topicfilter/*"
+              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topicfilter/*/*"
               - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topicfilter/$aws/*"
               - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/$aws/*"
-              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:wind-turbine/*"
+              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:*"
+              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:*/*"
           - Effect: Allow
             Action:
               - iot:UpdateThingShadow
             Resource:
-              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topicfilter/wind-turbine/*"
-              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:thing/edge-device-*"
+              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topicfilter/*"
+              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topicfilter/*/*"
+              - !Sub "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:thing/*"
           - Effect: Allow
             Action:
               - iot:AssumeRoleWithCertificate

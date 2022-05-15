@@ -328,7 +328,7 @@ Resources:
     Type: 'AWS::SageMaker::UserProfile'
     Properties:
       DomainId: !Ref SageMakerStudioDomain
-      UserProfileName: data-scientist
+      UserProfileName: bpistone
   JupyterApp:
     Type: 'AWS::SageMaker::App'
     DependsOn: SageMakerStudioUserProfile
@@ -336,7 +336,7 @@ Resources:
       AppName: default
       AppType: JupyterServer
       DomainId: !Ref SageMakerStudioDomain
-      UserProfileName: data-scientist
+      UserProfileName: bpistone
   DataScienceApp:
     Type: 'AWS::SageMaker::App'
     DependsOn: SageMakerStudioUserProfile
@@ -350,7 +350,7 @@ Resources:
           - RegionMap
           - !Ref 'AWS::Region'
           - datascience
-      UserProfileName: data-scientist
+      UserProfileName: bpistone
   DeleteKernelGatewayAppsNoKGCondition:
     Type: 'Custom::DeleteKernelGatewayApps'
     DependsOn: SageMakerStudioUserProfile

@@ -24,7 +24,7 @@ training:
     processing_ecr_image_tag: latest
     sagemaker_framework_version: 2.2
     sagemaker_python_version: py37
-    s3_bucket_name:
+    s3_bucket_name: isengard-bpistone-mlops-iot-dev
     s3_processing_input_files_path: input/data
     s3_processing_output_files_path: output/data
     s3_training_artifact_path: artifact/training
