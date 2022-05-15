@@ -65,7 +65,7 @@ class Client():
         
     # def subscribe_to_topics(self, turbine_id, callback_update_label, callback_update_anomalies):
     #     """
-    #     Used by WindTurbine class to subscribe to topics coming from inference app
+    #     Used by WindTurbine class to subscribe to topics coming from deployment app
     #     """
     #     try:
     #         turbine_update_label_topic = f'wind-turbine/{turbine_id}/label/update'

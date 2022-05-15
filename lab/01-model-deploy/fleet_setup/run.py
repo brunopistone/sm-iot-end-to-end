@@ -1,15 +1,15 @@
 # Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
 # SPDX-License-Identifier: MIT-0
-import os
-import stat
-import boto3
-import json
 import argparse
-import logging
-import tarfile
-import requests
-import io
+import boto3
 from botocore.exceptions import ClientError
+import io
+import json
+import logging
+import os
+import requests
+import stat
+import tarfile
 
 logger = logging.getLogger(__name__)
 

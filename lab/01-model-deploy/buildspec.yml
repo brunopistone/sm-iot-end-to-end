@@ -10,9 +10,14 @@ phases:
       - cd ..
   pre_build:
     commands:
-      - cd algorithms
+      - cd algorithms/inference/aws.samples.windturbine.detector
+      - rm -rf ./../../dist
+      - mkdir ./../../dist
+      - zip -r detector.zip *
+      - mv detector.zip ./../../dist
       - ./buildspec.sh training $S3_BUCKET_NAME
-      - cd ..
+      - cd ../../../
+      - aws s3 cp ./../algorithms/dist/detector.zip 's3://{bucket_name}/artifacts/inference/{model_package["ModelPackageVersion"]}.0.0/detector.zip'
       - role=$(aws sts assume-role --role-arn $CROSS_ACCOUNT_ROLE --role-session-name $ENV)
       - KEY=$(echo $role | jq ".Credentials.AccessKeyId" --raw-output)
       - SECRET=$(echo $role | jq ".Credentials.SecretAccessKey" --raw-output)
@@ -27,6 +32,6 @@ phases:
   build:
     commands:
       - cd mlpipelines/pipelines
-      - python3 run_pipeline.py -e $ENV -p training -i pipeline_name=$PIPELINE_NAME model_package_group_name=$MPName
+      - python3 run_pipeline.py -e $ENV -p deployment -i pipeline_name=$PIPELINE_NAME model_package_group_arn=$MPName inference_package=./../../algorithms/dist/detector.zip
 artifacts:
   files: "**/*"

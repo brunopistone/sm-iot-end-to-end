@@ -1,12 +1,13 @@
-inference:
-    region: us-east-1
+deployment:
+    region: eu-west-1
     role:
-    deployment_configs:
-        ComponentName: mlops-iot-regressor
-        PlatformOS: LINUX
-        PlatformArchitecture: X86_64
-    lambdas:
-        get-last-approved-model:
-        create-packaging-job:
-        check-packaging-job:
-    s3_bucket_name: isengard-bpistone-mlops-iot-dev
+    bucket_name:
+    component_name: aws.samples.windturbine.model
+    device_fleet_name: wind-turbine-farm
+    device_fleet_suffix: fleet-1
+    inference_recipes_entrypoint: ./../../algorithms/inference/recipes/aws.samples.windturbine.detector-recipe.json
+    model_name: WindTurbineAnomalyDetection
+    model_package_group_arn: mlops-iot-package-group
+    n_features: 6
+    thing_group_name: wind-ec2-fleet
+    pipeline_name: MLOpsIoTDeploy

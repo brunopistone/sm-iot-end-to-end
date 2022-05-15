@@ -57,7 +57,7 @@ class WindTurbine(object):
             widgets.HBox(self.noise_buttons)            
         ], layout={'visibility': 'hidden'})          
 
-        # subscribe to messages from inference app
+        # subscribe to messages from deployment app
         self.turbine_update_label_topic = f'wind-turbine/{turbine_id}/label/update'
         self.mqtt_client.subscribe(self.turbine_update_label_topic, mqtt.QoS.AT_LEAST_ONCE, handler=self.__callback_update_label__)
 
