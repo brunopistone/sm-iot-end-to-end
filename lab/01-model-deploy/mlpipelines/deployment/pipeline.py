@@ -28,6 +28,15 @@ s3_client = boto3.client('s3')
 s3_resource = boto3.resource('s3')
 sm_client = boto3.client('sagemaker')
 
+def create_component_version():
+    try:
+        pass
+    except Exception as e:
+        stacktrace = traceback.format_exc()
+        LOGGER.error("{}".format(stacktrace))
+
+        raise e
+
 def describe_model_package(model_package_arn):
     try:
         model_package = sm_client.describe_model_package(
@@ -139,6 +148,47 @@ def run_compilation_job(compilation_job_name, bucket_name, model_package, n_feat
             raise Exception("Compilation job ended with status {}. {}".format(resp['CompilationJobStatus'], resp))
         else:
             return resp
+    except Exception as e:
+        stacktrace = traceback.format_exc()
+        LOGGER.error("{}".format(stacktrace))
+
+        raise e
+
+def run_deployment_ggv2(bucket_name, device_fleet_name, device_fleet_suffix, ggv2_deployment_name, model_package, wind_turbine_thing_group_arn):
+    try:
+        device_fleets = sm_client.list_device_fleets(
+            NameContains="{}-{}".format(device_fleet_name, device_fleet_suffix))
+        wind_turbine_device_fleet_name = device_fleets['DeviceFleetSummaries'][0]['DeviceFleetName']
+
+        resp = ggv2_client.create_deployment(
+            targetArn=wind_turbine_thing_group_arn,
+            deploymentName=ggv2_deployment_name,
+            components={
+                "aws.greengrass.Cli": {
+                    "componentVersion": "2.5.4"
+                },
+                "aws.greengrass.SageMakerEdgeManager": {
+                    "componentVersion": "1.1.0",
+                    "configurationUpdate": {
+                        "merge": json.dumps(
+                            {"DeviceFleetName": wind_turbine_device_fleet_name, "BucketName": bucket_name})
+                    },
+                    "runWith": {}
+                },
+                "aws.samples.windturbine.detector": {
+                    "componentVersion": "{}.0.0".format(model_package["ModelPackageVersion"])
+                },
+                "aws.samples.windturbine.model": {
+                    "componentVersion": "{}.0.0".format(model_package["ModelPackageVersion"])
+                }
+            })
+
+        deployment_id = resp['deploymentId']
+        iot_job_id = resp['iotJobId']
+
+        LOGGER.info("GreenGrass Deployment Job ID: {}".format(iot_job_id))
+
+        return resp
     except Exception as e:
         stacktrace = traceback.format_exc()
         LOGGER.error("{}".format(stacktrace))
@@ -310,6 +360,39 @@ def setup_agent(agent_id, bucket_name, device_fleet_suffix, region, thing_group_
     with open('agent/conf/config_edge_device_%d.json' % agent_id, 'w') as conf:
         conf.write(json.dumps(agent_params, indent=4))
 
+def update_device_fleet(bucket_name, device_fleet_name, device_fleet_suffix):
+    try:
+        device_fleets = sm_client.list_device_fleets(
+            NameContains="{}-{}".format(device_fleet_name, device_fleet_suffix))
+        wind_turbine_device_fleet_name = device_fleets['DeviceFleetSummaries'][0]['DeviceFleetName']
+
+        update_device_fleet_response = sm_client.update_device_fleet(
+            DeviceFleetName=wind_turbine_device_fleet_name,
+            OutputConfig={
+                'S3OutputLocation': 's3://{}'.format(bucket_name),
+            },
+        )
+
+        return update_device_fleet_response
+    except Exception as e:
+        stacktrace = traceback.format_exc()
+        LOGGER.error("{}".format(stacktrace))
+
+        raise e
+
+def upload_inference_package(bucket_name, inference_package, model_package):
+    try:
+        s3_resource.meta.client.upload_file(
+            inference_package,
+            bucket_name,
+            "artifacts/inference/{}.0.0/{}".format(model_package["ModelPackageVersion"],
+                                                   inference_package.split("/")[-1]))
+    except Exception as e:
+        stacktrace = traceback.format_exc()
+        LOGGER.error("{}".format(stacktrace))
+
+        raise e
+
 def get_pipeline(
     region,
     bucket_name,
@@ -369,10 +452,7 @@ def get_pipeline(
     thing_groups = iot_client.list_thing_groups(namePrefixFilter=thing_group_name)
     wind_turbine_thing_group_arn = thing_groups['thingGroups'][0]['groupArn']
 
-    s3_resource.meta.client.upload_file(
-        inference_package,
-        bucket_name,
-        "artifacts/inference/{}.0.0/{}".format(model_package["ModelPackageVersion"], inference_package.split("/")[-1]))
+    upload_inference_package(bucket_name, inference_package, model_package)
 
     with open(inference_recipes_entrypoint) as f:
         recipe = f.read()
@@ -389,45 +469,18 @@ def get_pipeline(
         thing_group_name
     )
 
-    device_fleets = sm_client.list_device_fleets(NameContains="{}-{}".format(device_fleet_name, device_fleet_suffix))
-    wind_turbine_device_fleet_name = device_fleets['DeviceFleetSummaries'][0]['DeviceFleetName']
-
-    update_device_fleet_response = sm_client.update_device_fleet(
-        DeviceFleetName=wind_turbine_device_fleet_name,
-        OutputConfig={
-            'S3OutputLocation': 's3://{}'.format(bucket_name),
-        },
-    )
+    update_device_fleet_response = update_device_fleet(bucket_name, device_fleet_name, device_fleet_suffix)
 
     LOGGER.info("Update Device Fleet: {}".format(update_device_fleet_response))
 
     ggv2_deployment_name = 'wind-turbine-anomaly-ggv2-%d' % int(time.time() * 1000)
 
-    ggv2_deployment = ggv2_client.create_deployment(
-        targetArn=wind_turbine_thing_group_arn,
-        deploymentName=ggv2_deployment_name,
-        components={
-            "aws.greengrass.Cli": {
-                "componentVersion": "2.5.4"
-            },
-            "aws.greengrass.SageMakerEdgeManager": {
-                "componentVersion": "1.1.0",
-                "configurationUpdate": {
-                    "merge": json.dumps({"DeviceFleetName": wind_turbine_device_fleet_name, "BucketName": bucket_name})
-                },
-                "runWith": {}
-            },
-            "aws.samples.windturbine.detector": {
-                "componentVersion": "{}.0.0".format(model_package["ModelPackageVersion"])
-            },
-            "aws.samples.windturbine.model": {
-                "componentVersion": "{}.0.0".format(model_package["ModelPackageVersion"])
-            }
-        })
-
-    deployment_id = ggv2_deployment['deploymentId']
-    iot_job_id = ggv2_deployment['iotJobId']
-
-    LOGGER.info("GreenGrass Deployment Job ID: {}".format(iot_job_id))
+    run_deployment_ggv2(
+        bucket_name,
+        device_fleet_name,
+        device_fleet_suffix,
+        ggv2_deployment_name,
+        model_package,
+        wind_turbine_thing_group_arn)
 
     return None
