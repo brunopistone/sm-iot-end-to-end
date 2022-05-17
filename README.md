@@ -14,6 +14,8 @@ environment, Networking, and CI/CD for deploying ML models
 Everything can be tested by using the example notebooks for running training on SageMaker using the following frameworks:
 * PyTorch
 
+![Architecture](imgs/ML-end-to-end-iot.png "Architecture")
+
 ## Environment Setup
 
 Setup the ML environment by deploying the [CloudFormation](./infrastructure_templates) templates described as below:
