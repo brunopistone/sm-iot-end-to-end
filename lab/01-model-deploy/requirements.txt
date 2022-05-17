@@ -1,0 +1,6 @@
+boto3
+pandas
+PyYAML
+sagemaker
+scikit-learn
+torch==1.6.0
