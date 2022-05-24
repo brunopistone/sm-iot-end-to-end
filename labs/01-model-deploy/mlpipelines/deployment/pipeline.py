@@ -20,9 +20,9 @@ s3_client = boto3.client('s3')
 s3_resource = boto3.resource('s3')
 sm_client = boto3.client('sagemaker')
 
-def create_component_version():
+def create_component_version(recipe):
     try:
-        pass
+        ggv2_client.create_component_version(inlineRecipe=recipe)
     except Exception as e:
         stacktrace = traceback.format_exc()
         LOGGER.error("{}".format(stacktrace))
@@ -399,16 +399,6 @@ def get_pipeline(
     inference_package=None,
     role=None,
     pipeline_name="DeploymentPipeline"):
-    """Gets a SageMaker ML Pipeline instance working with on abalone data.
-
-    Args:
-        region: AWS region to create and run the pipeline.
-        role: IAM role to create and run steps and pipeline.
-        default_bucket: the bucket to use for storing the artifacts
-
-    Returns:
-        an instance of a pipeline
-    """
 
     sagemaker_session = get_session(region, bucket_name)
 
@@ -452,7 +442,7 @@ def get_pipeline(
     recipe = recipe.replace('_BUCKET_', bucket_name)
     recipe = recipe.replace('_VERSION_', str(model_package["ModelPackageVersion"]) + ".0.0")
 
-    ggv2_client.create_component_version(inlineRecipe=recipe)
+    create_component_version(recipe)
 
     setup_fleet(
         bucket_name,

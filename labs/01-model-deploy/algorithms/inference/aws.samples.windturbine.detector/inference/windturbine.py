@@ -12,7 +12,6 @@ import util
 import messaging_client as msg_client
 import os
 
-
 class WindTurbine(object):
     """ 
     This is the application class. It is responsible for:
@@ -23,7 +22,7 @@ class WindTurbine(object):
         - Launch a Edge Agent Client that integrates the Wind Turbine with the Edge Device
     """
     # extra args model_path, model_name, model_version
-    def __init__(self, turbine_id, agent_socket, model_path, model_name):
+    def __init__(self, turbine_id, agent_socket):
         if turbine_id is None:
             raise Exception("You need to pass the turbine id as argument")
         
@@ -31,67 +30,9 @@ class WindTurbine(object):
 
         self.msg_client = msg_client.MessagingClient(turbine_id)
         self.msg_client.subscribe_to_data(self.__data_handler__)
-#         self.msg_client.subscribe_to_status(self.__callback_is_turbine_running__)
 
         ## launch edge agent client
         self.edge_agent = EdgeAgentClient(agent_socket)
-        self.model_meta = {
-            "model_name" : model_name,
-            "model_path" : model_path
-        }
-
-        self.acc_buffer = []   
-        self.dashboard_buffer = []
-        self.model_loaded = False
-
-        self.resp = self.edge_agent.load_model(model_name, model_path)
-        if self.resp is None: 
-            logging.error('It was not possible to load the model. Is the agent running?')
-            sys.exit(1)
-        self.model_loaded = True 
-        
-        self.model_status_published = False
-        
-
-        # we need to load the statistics computed in the data prep notebook
-        # these statistics will be used to compute normalize the input
-        file_path = os.path.dirname(__file__)
-        logging.info(f"Reading stats from {file_path}")
-        self.raw_std = np.load(os.path.join(file_path, '../statistics/raw_std.npy'))
-        self.mean = np.load(os.path.join(file_path, '../statistics/mean.npy'))
-        self.std = np.load(os.path.join(file_path, '../statistics/std.npy'))
-        # then we load the thresholds computed in the training notebook
-        # for more info, take a look on the Notebook #2
-        self.thresholds = np.load(os.path.join(file_path, '../statistics/thresholds.npy'))
-        
-        # configurations to format the time based data for the anomaly detection model
-        # If you change these parameters you need to retrain your model with the new parameters        
-        self.INTERVAL = 5 # seconds
-        self.TIME_STEPS = 20 * self.INTERVAL # 50ms -> seg: 50ms * 20
-        self.STEP = 10
-        
-        # these are the features used in this application
-        self.feature_ids = [8,9,10,7,  22, 5, 6] # qX,qy,qz,qw  ,wind_seed_rps, rps, voltage        
-        self.n_features = 6 # roll, pitch, yaw, wind_speed, rotor_speed, voltage
-        
-        
-        # minimal buffer length for denoising. We need to accumulate some sample before denoising
-        self.min_num_samples = 500
-
-#     def __callback_is_turbine_running__(self, topic_name, payload):
-#         """
-#         gets the running status from turbines and update their status in turbine holder
-#         """
-#         json_response = json.loads(payload)
-#         turbine_status = json_response['running']
-        
-#         if turbine_status is True or turbine_status is False:
-#             self.running = turbine_status
-#         else:
-#             print("Invalid turbine status recieved from simulator, ignoring it, current status is: ", self.running)
-            
-        
-       
 
     def __del__(self):
         """Destructor"""
@@ -207,7 +148,57 @@ class WindTurbine(object):
         values = np.mean(pred_mae_loss, axis=1)
         anomalies = (values > self.thresholds)
         return values, anomalies   
-     
+
+    def load_model(self,  model_path, model_name):
+        logging.info("windturbine:load_model {} - {}".format(model_path, model_name))
+
+        self.model_meta = {
+            "model_name": model_name,
+            "model_path": model_path
+        }
+
+        self.acc_buffer = []
+        self.dashboard_buffer = []
+        self.model_loaded = False
+
+        self.edge_agent.unload_model(model_name)
+        self.resp = self.edge_agent.load_model(model_name, model_path)
+
+        if self.resp is None:
+            logging.error('It was not possible to load the model. Is the agent running?')
+            sys.exit(1)
+        self.model_loaded = True
+
+        self.model_status_published = False
+
+        # we need to load the statistics computed in the data prep notebook
+        # these statistics will be used to compute normalize the input
+        file_path = os.path.dirname(__file__)
+        logging.info(f"Reading stats from {file_path}")
+        self.raw_std = np.load(os.path.join(file_path, '../statistics/raw_std.npy'))
+        self.mean = np.load(os.path.join(file_path, '../statistics/mean.npy'))
+        self.std = np.load(os.path.join(file_path, '../statistics/std.npy'))
+        # then we load the thresholds computed in the training notebook
+        # for more info, take a look on the Notebook #2
+        self.thresholds = np.load(os.path.join(file_path, '../statistics/thresholds.npy'))
+
+        # configurations to format the time based data for the anomaly detection model
+        # If you change these parameters you need to retrain your model with the new parameters
+        self.INTERVAL = 5  # seconds
+        self.TIME_STEPS = 20 * self.INTERVAL  # 50ms -> seg: 50ms * 20
+        self.STEP = 10
+
+        # these are the features used in this application
+        self.feature_ids = [8, 9, 10, 7, 22, 5, 6]  # qX,qy,qz,qw  ,wind_seed_rps, rps, voltage
+        self.n_features = 6  # roll, pitch, yaw, wind_speed, rotor_speed, voltage
+
+        # minimal buffer length for denoising. We need to accumulate some sample before denoising
+        self.min_num_samples = 500
+
+    def unload_model(self, model_name):
+        logging.info("windturbine:unload_model {}".format(model_name))
+
+        self.edge_agent.unload_model(model_name)
 
     def start(self):
         """
@@ -219,7 +210,6 @@ class WindTurbine(object):
         logging.info("Waiting for data...")
         while self.running:
             time.sleep(0.1)
-            
                 # finally start the anomaly detection loop
 
     def halt(self):
@@ -227,5 +217,3 @@ class WindTurbine(object):
         Destroys the application
         """
         self.running = False
-            
-            

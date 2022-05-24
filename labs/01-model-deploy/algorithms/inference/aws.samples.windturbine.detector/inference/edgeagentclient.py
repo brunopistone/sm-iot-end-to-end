@@ -28,7 +28,14 @@ class EdgeAgentClient(object):
     
     def __update_models_list__(self):
         models_list = self.agent.ListModels(agent.ListModelsRequest())
-        self.model_map = {m.name:{'in': m.input_tensor_metadatas, 'out': m.output_tensor_metadatas} for m in models_list.models}
+
+        self.model_map = {
+            m.name: {
+                'in': m.input_tensor_metadatas,
+                'out': m.output_tensor_metadatas
+            } for m in models_list.models
+        }
+
         return self.model_map
     
     def capture_data(self, model_name, input_tensor, output_tensor):
@@ -95,8 +102,10 @@ class EdgeAgentClient(object):
     def load_model(self, model_name, model_path):
         """ Load a new model into the Edge Agent if not loaded yet"""
         try:
+            logging.info("edgeagentclient:load_model")
+
             if self.is_model_loaded(model_name):
-                logging.info( "Model %s was already loaded" % model_name )
+                logging.info("Model %s was already loaded" % model_name)
                 return self.model_map
             req = agent.LoadModelRequest()
             req.url = model_path
@@ -111,6 +120,8 @@ class EdgeAgentClient(object):
     def unload_model(self, model_name):
         """ UnLoad model from the Edge Agent"""
         try:
+            logging.info("edgeagentclient:unload_model")
+
             if not self.is_model_loaded(model_name):
                 logging.info( "Model %s was not loaded" % model_name )
                 return self.model_map

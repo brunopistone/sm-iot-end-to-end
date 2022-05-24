@@ -6,7 +6,6 @@ from inference.windturbine import WindTurbine
 
 turbine = None
 
-
 def signal_handler(signum, frame):
     if turbine != None:
         turbine.halt()
@@ -28,9 +27,11 @@ if __name__ == "__main__":
     turbine_id = device_name[-1]
     log.info(f"Initializing the inference component for {device_name} which is turbine [{turbine_id}]")
 
-    turbine = WindTurbine(turbine_id, args.agent_socket, args.model_path, 'detector')
+    turbine = WindTurbine(turbine_id, args.agent_socket)
+
+    turbine.unload_model('detector')
+    turbine.load_model(args.model_path, 'detector')
+
     turbine.start()
 
     print('Should never get here')
-    
-
