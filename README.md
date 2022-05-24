@@ -64,45 +64,45 @@ a cloud digital twin, such as EC2 instances, SageMaker Edge Manager Device Fleet
 
 ### Build and Train ML models
 
-The code structure defined for the [Build and Train ML models](./lab/00-model-build-train) is the following:
+The code structure defined for the [Build and Train ML models](labs/00-model-build-train) is the following:
 
-* [algorithms](./lab/00-model-build-train/algorithms): The code used by the ML pipelines for processing and training ML models is stored in this folder
-  * [algorithms/preprocessing](./lab/00-model-build-train/algorithms/preprocessing): This folder contains the python code for performing processing of data
+* [algorithms](labs/00-model-build-train/algorithms): The code used by the ML pipelines for processing and training ML models is stored in this folder
+  * [algorithms/preprocessing](labs/00-model-build-train/algorithms/preprocessing): This folder contains the python code for performing processing of data
   using Amazon SageMaker Processing Jobs
-  * [algorithms/training](./lab/00-model-build-train/algorithms/training): This folder contains the python code for training a custom ML model 
+  * [algorithms/training](labs/00-model-build-train/algorithms/training): This folder contains the python code for training a custom ML model 
   using Amazon SageMaker Training Jobs
-* [mlpipelines](./lab/00-model-build-train/mlpipelines): This folder contains some utilities scripts created in the official AWS example 
+* [mlpipelines](labs/00-model-build-train/mlpipelines): This folder contains some utilities scripts created in the official AWS example 
 [Amazon SageMaker secure MLOps](https://github.com/aws-samples/amazon-sagemaker-secure-mlops) and it contains the definition for the 
 Amazon SageMaker Pipeline used for training
-  * [mlpipelines/training](./lab/00-model-build-train/mlpipelines/training): This folder contains the python code for the ML pipelines used for training
-* [notebooks](./lab/00-model-build-train/notebooks): This folder contains the lab notebooks to use for this workshop:
-  * [notebooks/00-Data-Visualization](./lab/00-model-build-train/notebooks/00-Data-Visualization.ipynb): Explore the input data and test the processing scripts 
+  * [mlpipelines/training](labs/00-model-build-train/mlpipelines/training): This folder contains the python code for the ML pipelines used for training
+* [notebooks](labs/00-model-build-train/notebooks): This folder contains the lab notebooks to use for this workshop:
+  * [notebooks/00-Data-Visualization](labs/00-model-build-train/notebooks/00-Data-Visualization.ipynb): Explore the input data and test the processing scripts 
   in the notebook
-  * [notebooks/01-Training-with-Pytorch](./lab/00-model-build-train/notebooks/01-Training-with-Pytorch.ipynb): SageMaker 
+  * [notebooks/01-Training-with-Pytorch](labs/00-model-build-train/notebooks/01-Training-with-Pytorch.ipynb): SageMaker 
   End to End approach for processing data using SageMaker Processing, Training the ML model using SageMaker Training, Register 
   the trained model version by using Amazon SageMaker Model Registry, evaulate your model by creating inference data using 
   Amazon SageMaker Batch Transform
-  * [notebooks/02-SageMaker-Pipeline-Training](./lab/00-model-build-train/notebooks/02-SageMaker-Pipeline-Training.ipynb): Define 
+  * [notebooks/02-SageMaker-Pipeline-Training](labs/00-model-build-train/notebooks/02-SageMaker-Pipeline-Training.ipynb): Define 
   the workflow steps and test the entire end to end using Amazon SageMaker Pipeline
 
 ### Deploy ML models to simulated edge devices
 
-The code structure defined for the [Deploy ML models to simulated edge devices](./lab/01-model-deploy) is the following:
+The code structure defined for the [Deploy ML models to simulated edge devices](labs/01-model-deploy) is the following:
 
-* [algorithms](./lab/01-model-deploy/algorithms): The code used for creating the AWS GreenGrass inference component is stored in this folder
-  * [algorithms/inference](./lab/01-model-deploy/algorithms/inference): This folder contains the scripts used for performing 
+* [algorithms](labs/01-model-deploy/algorithms): The code used for creating the AWS GreenGrass inference component is stored in this folder
+  * [algorithms/inference](labs/01-model-deploy/algorithms/inference): This folder contains the scripts used for performing 
   inference on the edge devices. It contains also the recipe definition for the AWS GreenGrass component for inference
-* [mlpipelines](./lab/01-model-deploy/mlpipelines): This folder contains some utilities scripts created in the official AWS example 
+* [mlpipelines](labs/01-model-deploy/mlpipelines): This folder contains some utilities scripts created in the official AWS example 
 [Amazon SageMaker secure MLOps](https://github.com/aws-samples/amazon-sagemaker-secure-mlops) and it contains the definition of 
 the script for performing Compilation, Packaging and GreenGrass Deployment
-  * [mlpipelines/deployment](./lab/01-model-deploy/mlpipelines/deployment): This folder contains the python code for 
+  * [mlpipelines/deployment](labs/01-model-deploy/mlpipelines/deployment): This folder contains the python code for 
   running SageMaker Neo compilation Job, SageMaker Edge Manager Packaging Job and GreenGrass deployment of the model and inference components
-* [notebooks](./lab/01-model-deploy/notebooks): This folder contains the lab notebooks to use for this workshop:
-  * [notebooks/00-Package-using-ggv2](./lab/01-model-deploy/notebooks/00-Package-using-ggv2.ipynb): Explore the usage of 
+* [notebooks](labs/01-model-deploy/notebooks): This folder contains the lab notebooks to use for this workshop:
+  * [notebooks/00-Package-using-ggv2](labs/01-model-deploy/notebooks/00-Package-using-ggv2.ipynb): Explore the usage of 
   Amazon SageMaker Neo, Amazon SageMaker Edge Manager for creating IoT GreenGrass components for the ML model read from the 
   Amazon SageMaker Model Registry. It also create the IoT GreenGrass Component for inference, and creates the deployment component 
   for the Edge devices.
-  * [notebooks/01-Run-simulated-fleet-ggv2](./lab/01-model-deploy/notebooks/01-Run-simulated-fleet-ggv2.ipynb): Run a simulation of 
+  * [notebooks/01-Run-simulated-fleet-ggv2](labs/01-model-deploy/notebooks/01-Run-simulated-fleet-ggv2.ipynb): Run a simulation of 
   wind turbine and test the behaviour of the ML model deployed
-  * [notebooks/02-Pipeline-Deployment](./lab/01-model-deploy/notebooks/02-Pipeline-Deployment.ipynb): Test the execution of the Pipeline 
+  * [notebooks/02-Pipeline-Deployment](labs/01-model-deploy/notebooks/02-Pipeline-Deployment.ipynb): Test the execution of the Pipeline 
   script before pushing in the repository for CI/CD automation

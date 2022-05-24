@@ -118,8 +118,14 @@ Resources:
         IgnorePublicAcls: true
         BlockPublicPolicy: true
         RestrictPublicBuckets: true
+
   DefaultPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: F40
+            reason: "PassRole required for passing role to studio resources by role"
     Properties:
       PolicyDocument:
         Version: 2012-10-17
@@ -168,6 +174,7 @@ Resources:
               - 'logs:PutLogEvents'
               - 'sts:AssumeRole'
             Resource: '*'
+
   S3Policy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
@@ -190,6 +197,7 @@ Resources:
               - 's3:ListBucket'
             Resource:
               - '*'
+
   ServicesPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
@@ -203,7 +211,6 @@ Resources:
               - 'codecommit:*'
               - 'ecr:*'
               - 'greengrass:*'
-              - 'iam:*'
               - 'iot:*'
               - 'lambda:*'
               - 'logs:*'
@@ -218,6 +225,7 @@ Resources:
               - 'iam:PassRole'
             Resource:
               - !Sub 'arn:aws:iam::${AWS::AccountId}:role/*'
+
   SageMakerExecutionRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -237,6 +245,7 @@ Resources:
         - !Ref DefaultPolicy
         - !Ref S3Policy
         - !Ref ServicesPolicy
+
   SageMakerStudioDomain:
     Type: 'AWS::SageMaker::Domain'
     Properties:
@@ -262,6 +271,7 @@ Resources:
         - VpcIdEmpty
         - '{{resolve:ssm:/networking/vpc}}'
         - !Ref VpcId
+
   EnableSageMakerProjects:
     Type: 'Custom::ResourceForEnablingSageMakerProjects'
     Properties:
@@ -271,6 +281,7 @@ Resources:
       ExecutionRole: !GetAtt
         - SageMakerExecutionRole
         - Arn
+
   EnableSageMakerProjectsLambda:
     Type: 'AWS::Lambda::Function'
     DependsOn: SageMakerStudioDomain
@@ -318,11 +329,13 @@ Resources:
         - Arn
       Runtime: python3.8
       Timeout: 120
+
   SageMakerStudioUserProfile:
     Type: 'AWS::SageMaker::UserProfile'
     Properties:
       DomainId: !Ref SageMakerStudioDomain
       UserProfileName: data-scientist
+
   JupyterApp:
     Type: 'AWS::SageMaker::App'
     DependsOn: SageMakerStudioUserProfile
@@ -331,6 +344,7 @@ Resources:
       AppType: JupyterServer
       DomainId: !Ref SageMakerStudioDomain
       UserProfileName: data-scientist
+
   DataScienceApp:
     Type: 'AWS::SageMaker::App'
     DependsOn: SageMakerStudioUserProfile
@@ -345,6 +359,7 @@ Resources:
           - !Ref 'AWS::Region'
           - datascience
       UserProfileName: data-scientist
+
   DeleteKernelGatewayAppsNoKGCondition:
     Type: 'Custom::DeleteKernelGatewayApps'
     DependsOn: SageMakerStudioUserProfile
@@ -353,6 +368,7 @@ Resources:
         - DeleteKernelGatewayAppsLambda
         - Arn
       DomainId: !Ref SageMakerStudioDomain
+
   DeleteKernelGatewayAppsKGCondition:
     Type: 'Custom::DeleteKernelGatewayApps'
     DependsOn:
@@ -362,6 +378,7 @@ Resources:
         - DeleteKernelGatewayAppsLambda
         - Arn
       DomainId: !Ref SageMakerStudioDomain
+
   DeleteKernelGatewayAppsLambda:
     Type: 'AWS::Lambda::Function'
     Properties:
@@ -418,6 +435,7 @@ Resources:
         - Arn
       Runtime: python3.8
       Timeout: 900
+
   SageMakerExecutionRoleSSM:
     Type: AWS::SSM::Parameter
     Properties:

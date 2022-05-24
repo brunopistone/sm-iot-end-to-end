@@ -38,14 +38,17 @@ Resources:
         IgnorePublicAcls: true
         BlockPublicPolicy: true
         RestrictPublicBuckets: true
+
   CodeRepositoryTraining:
     Type: 'AWS::CodeCommit::Repository'
     Properties:
       RepositoryName: !Ref RepositoryTrainingName
+
   CodeRepositoryDeployment:
     Type: 'AWS::CodeCommit::Repository'
     Properties:
       RepositoryName: !Ref RepositoryDeploymentName
+
   CodePolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
@@ -74,6 +77,7 @@ Resources:
               - 'sts:GetCallerIdentity'
             Resource:
               - '*'
+
   CodeRole:
     Type: 'AWS::IAM::Role'
     Properties:
@@ -90,6 +94,7 @@ Resources:
       Path: /
       ManagedPolicyArns:
         - !Ref CodePolicy
+
   BuildProjectDev:
     Type: 'AWS::CodeBuild::Project'
     Properties:
@@ -115,6 +120,7 @@ Resources:
       Source:
         BuildSpec: buildspec.yml
         Type: CODEPIPELINE
+
   BuildProjectNoProd:
     Type: 'AWS::CodeBuild::Project'
     Properties:
@@ -140,6 +146,7 @@ Resources:
       Source:
         BuildSpec: buildspec.yml
         Type: CODEPIPELINE
+
   CodePipelineTrainingDev:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties:
@@ -188,7 +195,8 @@ Resources:
                 - Name: ModelBuildBuildArtifact
               Region: !Sub '${AWS::Region}'
               RunOrder: 1
-  CodePipelineDeployment:
+
+  CodePipelineDeploymentNoProd:
     Type: 'AWS::CodePipeline::Pipeline'
     Properties:
       Name: !If
@@ -243,4 +251,4 @@ Resources:
       Name: /codepipeline/deployment
       Tier: Standard
       Type: String
-      Value: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${CodePipelineDeployment}"
+      Value: !Sub "arn:aws:codepipeline:${AWS::Region}:${AWS::AccountId}:${CodePipelineDeploymentNoProd}"

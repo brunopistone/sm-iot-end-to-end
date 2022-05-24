@@ -11,6 +11,11 @@ Mappings:
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W36
+            reason: "Flow log not required for demo purposes"
     Properties:
       CidrBlock: !FindInMap
         - VpcConfigurations
@@ -37,6 +42,11 @@ Resources:
 
   PublicSubnet1:
     Type: 'AWS::EC2::Subnet'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W33
+            reason: "Public IP required for interacting with EC2 instances"
     Properties:
       VpcId: !Ref VPC
       AvailabilityZone: !Select
@@ -126,6 +136,19 @@ Resources:
 
   SageMakerInstanceSecurityGroup:
     Type: 'AWS::EC2::SecurityGroup'
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W5
+            reason: "CIDR required from Studio Setup"
+          - id: W28
+            reason: "Explicit name required for EC2 configurations"
+          - id: W36
+            reason: "No description required"
+          - id: W40
+            reason: "Egress -1 required from Studio Setup"
+          - id: W42
+            reason: "Ingress -1 required from Studio Setup"
     Properties:
       GroupName: SMSG
       GroupDescription: Security group with no ingress rule
@@ -135,8 +158,14 @@ Resources:
           ToPort: -1
           CidrIp: 0.0.0.0/0
       VpcId: !Ref VPC
+
   SageMakerInstanceSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W36
+            reason: "No description required"
     Properties:
       IpProtocol: '-1'
       GroupId: !Ref SageMakerInstanceSecurityGroup
@@ -144,6 +173,17 @@ Resources:
 
   VPCEndpointSecurityGroup:
     Type: AWS::EC2::SecurityGroup
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W5
+            reason: "CIDR required from Studio Setup"
+          - id: W36
+            reason: "No description required"
+          - id: W40
+            reason: "Egress -1 required from Studio Setup"
+          - id: W42
+            reason: "Ingress -1 required from Studio Setup"
     Properties:
       GroupDescription: Allow TLS for VPC Endpoint
       SecurityGroupEgress:
@@ -158,6 +198,11 @@ Resources:
 
   EndpointSecurityGroupIngress:
     Type: AWS::EC2::SecurityGroupIngress
+    Metadata:
+      cfn_nag:
+        rules_to_suppress:
+          - id: W36
+            reason: "No description required"
     Properties:
       IpProtocol: '-1'
       GroupId: !Ref VPCEndpointSecurityGroup
