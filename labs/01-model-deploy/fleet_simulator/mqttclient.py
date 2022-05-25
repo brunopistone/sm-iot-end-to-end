@@ -51,9 +51,6 @@ class Client():
         self.mqtt_connection = mqtt_connection
         return True
 
-
-    
-
     def publish(self, topic, data):
         """
         Publish message to IoT MQTT client.
@@ -62,7 +59,6 @@ class Client():
         self.mqtt_connection.publish(
             topic, json_payload, mqtt.QoS.AT_LEAST_ONCE)
 
-        
     # def subscribe_to_topics(self, turbine_id, callback_update_label, callback_update_anomalies):
     #     """
     #     Used by WindTurbine class to subscribe to topics coming from deployment app
@@ -76,7 +72,6 @@ class Client():
     #     except Exception as ex:
     #         raise ex
 
-
     def subscribe(self, topic, qos, handler):
         """
         Subscribe to topics coming from inference app
@@ -87,8 +82,6 @@ class Client():
             logging.info("Subscribed to {}".format(topic))   
         except Exception as ex:
             raise ex
-
-        
 
     def disconnect(self):
         """

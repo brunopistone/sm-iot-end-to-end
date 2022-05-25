@@ -67,8 +67,9 @@ class WindTurbine(object):
         # self.mqtt_client.subscribe_to_topics(self.turbine_id,
         #                                     self.callback_update_label,
         #                                     self.callback_update_anomalies)
-        
-        self.feature_ids = np.array([8,9,10,7,  22, 5, 6]) # qX,qy,qz,qw  ,wind_seed_rps, rps, voltage  
+
+        # qX,qy,qz,qw  ,wind_seed_rps, rps, voltage
+        self.feature_ids = np.array([8, 9, 10, 7, 22, 5, 6])
         self.feature_names = np.array(['qx', 'qy', 'qz', 'qw', 'wind speed rps', 'rps', 'voltage'])
         self.data_buffer = {}
         self.raw_data_topic = 'wind-turbine/'+str(self.turbine_id)+'/raw-data'

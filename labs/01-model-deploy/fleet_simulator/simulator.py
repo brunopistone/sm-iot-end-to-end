@@ -26,16 +26,17 @@ class WindTurbineFarmSimulator(object):
         # read the raw data. This data was captured from real sensors installed in the mini Wind Turbine
         self.raw_data = pd.read_csv(os.path.join(os.path.dirname(__file__), './../data/dataset_wind_turbine.csv.gz'), compression="gzip", sep=',', low_memory=False).values
         
-        self.mqtt_client=mqttclient.Client(client_id='simulator')
+        self.mqtt_client = mqttclient.Client(client_id='simulator')
         self.mqtt_client.connect()
         
         # now create the virtual wind turbines
         self.turbines = [WindTurbine(i, self.raw_data, client=self.mqtt_client) for i in range(n_turbines)]
 
         self.running = False
-        self.halted = False     
-        
-        self.feature_ids = np.array([8,9,10,7,  22, 5, 6]) # qX,qy,qz,qw  ,wind_seed_rps, rps, voltage        
+        self.halted = False
+
+        # qX,qy,qz,qw,wind_seed_rps,rps,voltage
+        self.feature_ids = np.array([8, 9, 10, 7, 22, 5, 6])
         self.feature_names = np.array(['qx', 'qy', 'qz', 'qw', 'wind speed rps', 'rps', 'voltage'])
 
         self.dashboard = widgets.Textarea(value='\n' * self.n_turbines, disabled=True,
@@ -45,8 +46,6 @@ class WindTurbineFarmSimulator(object):
             update_dashboard_topic = f'wind-turbine/{i}/dashboard/update'
             self.mqtt_client.subscribe(update_dashboard_topic, mqtt.QoS.AT_LEAST_ONCE, handler=self.__callback_update_dashboard__)
 
-        
-
     def start(self):
         """
         Run the main application,
@@ -55,7 +54,6 @@ class WindTurbineFarmSimulator(object):
         if not self.running and not self.halted:
             self.running = True
 
-    
     def halt(self):
         """
         Stop the turbines
@@ -66,7 +64,6 @@ class WindTurbineFarmSimulator(object):
             # halt all the turbines
             for i in self.turbines: i.halt()   
             self.mqtt_client.disconnect()
-
 
     def get_num_turbines(self):
         """
@@ -83,7 +80,6 @@ class WindTurbineFarmSimulator(object):
             self.dashboard
         ])
     
-    
     def __callback_update_dashboard__(self, topic, payload, dup, qos, retain, **kwargs):
         """
         Callback when turbine receives new data from the inference app; to be updated on dashboard 
@@ -92,7 +88,6 @@ class WindTurbineFarmSimulator(object):
         json_response = json.loads(payload)
         dashboard_data = np.array(json_response).astype(object)
         self.__update_dashboard__(turbine_id, dashboard_data)
-
 
     def __update_dashboard__(self, turbine_id, data):
         """
@@ -105,7 +100,6 @@ class WindTurbineFarmSimulator(object):
         tokens = ["%s: %0.3f" % (self.feature_names[i], features[i]) for i in range(len(features))]
         lines[turbine_id] = ' '.join(["Turbine: %d" % turbine_id] + tokens)        
         self.dashboard.value = '\n'.join(lines)
-
 
     def __del__(self):
         """

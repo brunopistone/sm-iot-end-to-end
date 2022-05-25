@@ -6,6 +6,7 @@ import logging
 import os
 import requests
 import sagemaker
+import shutil
 import stat
 import tarfile
 import time
@@ -231,13 +232,6 @@ def setup_fleet(bucket_name, device_fleet_suffix, thing_group_name, region, num_
     agent_config_package_prefix = 'wind_turbine_agent/config.tgz'
 
     try:
-        s3_client.download_file(Bucket=bucket_name, Key=agent_config_package_prefix, Filename='/tmp/dump')
-        LOGGER.info('The agent configuration package was already built! Skipping...')
-        quit()
-    except ClientError as e:
-        pass
-
-    try:
         thing_group_arn = iot_client.describe_thing_group(thingGroupName=thing_group_name)['thingGroupArn']
         LOGGER.info("Thing group found")
     except iot_client.exceptions.ResourceNotFoundException as e:
@@ -279,6 +273,8 @@ def setup_fleet(bucket_name, device_fleet_suffix, thing_group_name, region, num_
         f.seek(0)
         LOGGER.info("Uploading to S3")
         s3_client.upload_fileobj(f, Bucket=bucket_name, Key=agent_config_package_prefix)
+
+    shutil.rmtree('agent')
 
     LOGGER.info("Done!")
 

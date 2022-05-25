@@ -1,5 +1,3 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: MIT-0
 import argparse
 import boto3
 from botocore.exceptions import ClientError
@@ -8,6 +6,7 @@ import json
 import logging
 import os
 import requests
+import shutil
 import stat
 import tarfile
 
@@ -45,9 +44,9 @@ def setup_agent(agent_id, args, thing_group_name, thing_group_arn):
     
     # if you reach this point you need to create new certificates
     # generate the certificates    
-    cert=base % (agent_id, 'cert')
-    key=base % (agent_id, 'pub')
-    pub=base % (agent_id, 'key')
+    cert = base % (agent_id, 'cert')
+    key = base % (agent_id, 'pub')
+    pub = base % (agent_id, 'key')
     
     cert_meta=iot_client.create_keys_and_certificate(setAsActive=True)
     cert_arn = cert_meta['certificateArn']
@@ -147,6 +146,8 @@ if __name__ == "__main__":
             tar.add('agent', recursive=True)
         f.seek(0)
         logger.info("Uploading to S3")
-        s3_client.upload_fileobj(f, Bucket=args.artifact_bucket, Key=agent_config_package_prefix) 
-    logger.info("Done!")
+        s3_client.upload_fileobj(f, Bucket=args.artifact_bucket, Key=agent_config_package_prefix)
 
+    shutil.rmtree('agent')
+
+    logger.info("Done!")

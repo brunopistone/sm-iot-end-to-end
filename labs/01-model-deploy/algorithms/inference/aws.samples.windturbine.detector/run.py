@@ -29,7 +29,6 @@ if __name__ == "__main__":
 
     turbine = WindTurbine(turbine_id, args.agent_socket)
 
-    turbine.unload_model('detector')
     turbine.load_model(args.model_path, 'detector')
 
     turbine.start()
