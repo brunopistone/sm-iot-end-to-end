@@ -26,7 +26,7 @@ class WindTurbine(object):
         if turbine_id is None:
             raise Exception("You need to pass the turbine id as argument")
         
-        self.running = False # running status
+        self.running = False
 
         self.msg_client = msg_client.MessagingClient(turbine_id)
         self.msg_client.subscribe_to_data(self.__data_handler__)
@@ -216,4 +216,5 @@ class WindTurbine(object):
         """
         Destroys the application
         """
+        logging.info("Destroying the application")
         self.running = False

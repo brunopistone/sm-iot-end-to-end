@@ -33,5 +33,3 @@ if __name__ == "__main__":
     turbine.load_model(args.model_path, 'detector')
 
     turbine.start()
-
-    print('Should never get here')
