@@ -112,6 +112,8 @@ class EdgeAgentClient(object):
             req.name = model_name
             resp = self.agent.LoadModel(req)
 
+            logging.info("edgeagentclient:load_model - {}".format(resp))
+
             return self.__update_models_list__()            
         except Exception as e:
             logging.error(e)        
@@ -122,9 +124,9 @@ class EdgeAgentClient(object):
         try:
             logging.info("edgeagentclient:unload_model")
 
-            if not self.is_model_loaded(model_name):
-                logging.info( "Model %s was not loaded" % model_name )
-                return self.model_map
+            # if not self.is_model_loaded(model_name):
+            #     logging.info("Model %s was not loaded" % model_name )
+            #     return self.model_map
             
             req = agent.UnLoadModelRequest()
             req.name = model_name

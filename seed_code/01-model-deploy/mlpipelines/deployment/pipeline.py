@@ -23,6 +23,7 @@ sm_client = boto3.client('sagemaker')
 
 def create_component_version(recipe):
     try:
+        LOGGER.info("Create Component Version for Inference code")
         ggv2_client.create_component_version(inlineRecipe=recipe)
     except Exception as e:
         stacktrace = traceback.format_exc()
@@ -149,6 +150,8 @@ def run_compilation_job(compilation_job_name, bucket_name, model_package, n_feat
 
 def run_deployment_ggv2(bucket_name, device_fleet_name, device_fleet_suffix, ggv2_deployment_name, model_package, wind_turbine_thing_group_arn):
     try:
+        LOGGER.info("Start Deployment")
+
         device_fleets = sm_client.list_device_fleets(
             NameContains="{}-{}".format(device_fleet_name, device_fleet_suffix))
         wind_turbine_device_fleet_name = device_fleets['DeviceFleetSummaries'][0]['DeviceFleetName']
@@ -291,15 +294,30 @@ def setup_agent(agent_id, bucket_name, device_fleet_suffix, region, thing_group_
     # register the device in the fleet
     # the device name needs to have 36 chars
     dev_name = "edge-device-%d" % agent_id
-    dev = [{'DeviceName': dev_name, 'IotThingName': dev_name}]
 
-    try:
-        sm_client.describe_device(DeviceFleetName=fleet_name, DeviceName=dev_name)
-        LOGGER.info("Device was already registered on SageMaker Edge Manager")
-    except ClientError as e:
-        if e.response['Error']['Code'] != 'ValidationException': raise e
-        LOGGER.info("Registering a new device %s on fleet %s" % (dev_name, fleet_name))
-        sm_client.register_devices(DeviceFleetName=fleet_name, Devices=dev)
+    """
+        Check if Thing is added to thing group
+    """
+    response = iot_client.list_thing_groups_for_thing(
+        thingName='edge-device-%d' % agent_id,
+        maxResults=100
+    )
+
+    LOGGER.info("List thins per agent edge-device-{}".format(agent_id))
+    LOGGER.info(response)
+
+    found = False
+
+    if "thingGroups" in response and len(response["thingGroups"]) > 0:
+        for group in response["thingGroups"]:
+            if group["groupName"] == thing_group_name:
+                LOGGER.info("Agent edge-device-{} already in the group {}".format(agent_id, thing_group_name))
+                found = True
+                break
+
+    if not found:
+        LOGGER.info("Adding agent edge-device-{} to group {}".format(agent_id, thing_group_name))
+
         iot_client.add_thing_to_thing_group(
             thingGroupName=thing_group_name,
             thingGroupArn=thing_group_arn,
@@ -350,6 +368,8 @@ def setup_agent(agent_id, bucket_name, device_fleet_suffix, region, thing_group_
 
 def update_device_fleet(bucket_name, device_fleet_name, device_fleet_suffix):
     try:
+        LOGGER.info("Updating SageMaker Edge Manager Device Fleet")
+
         device_fleets = sm_client.list_device_fleets(
             NameContains="{}-{}".format(device_fleet_name, device_fleet_suffix))
         wind_turbine_device_fleet_name = device_fleets['DeviceFleetSummaries'][0]['DeviceFleetName']
@@ -443,8 +463,8 @@ def get_pipeline(
     setup_fleet(
         bucket_name,
         device_fleet_suffix,
-        region,
-        thing_group_name
+        thing_group_name,
+        "eu-central-1",
     )
 
     update_device_fleet_response = update_device_fleet(bucket_name, device_fleet_name, device_fleet_suffix)

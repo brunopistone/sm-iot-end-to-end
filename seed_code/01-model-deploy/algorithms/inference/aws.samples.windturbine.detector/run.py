@@ -2,12 +2,16 @@ import logging
 import argparse
 import os
 import signal
+import sys
+import time
+
 from inference.windturbine import WindTurbine
 
 turbine = None
 
 def signal_handler(signum, frame):
     if turbine != None:
+        turbine.unload_model('detector')
         turbine.halt()
 
 if __name__ == "__main__":
@@ -29,6 +33,15 @@ if __name__ == "__main__":
 
     turbine = WindTurbine(turbine_id, args.agent_socket)
 
-    turbine.load_model(args.model_path, 'detector')
+    response = turbine.load_model(args.model_path, 'detector')
 
-    turbine.start()
+    if response:
+        turbine.start()
+    else:
+        while turbine.tentative < 5:
+            turbine.unload_model('detector')
+
+            turbine.load_model(args.model_path, 'detector')
+            time.sleep(30)
+
+        sys.exit(1)

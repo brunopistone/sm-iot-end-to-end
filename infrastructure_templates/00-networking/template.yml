@@ -1,13 +1,11 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Private Networking Environment for SageMaker Studio
-
 Mappings:
   VpcConfigurations:
     cidr:
       Vpc: 10.0.0.0/16
       PublicSubnet1: 10.0.10.0/24
       PrivateSubnet1: 10.0.20.0/24
-
 Resources:
   VPC:
     Type: 'AWS::EC2::VPC'

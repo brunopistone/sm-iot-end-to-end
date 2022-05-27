@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: ML Environment
+Description: ML Environment Template
 Parameters:
   AccountIdTooling:
     Type: String

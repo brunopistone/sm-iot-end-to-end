@@ -27,6 +27,7 @@ class WindTurbine(object):
             raise Exception("You need to pass the turbine id as argument")
         
         self.running = False
+        self.tentative = 0
 
         self.msg_client = msg_client.MessagingClient(turbine_id)
         self.msg_client.subscribe_to_data(self.__data_handler__)
@@ -161,12 +162,13 @@ class WindTurbine(object):
         self.dashboard_buffer = []
         self.model_loaded = False
 
-        self.edge_agent.unload_model(model_name)
         self.resp = self.edge_agent.load_model(model_name, model_path)
 
         if self.resp is None:
             logging.error('It was not possible to load the model. Is the agent running?')
-            sys.exit(1)
+            self.tentative += 1
+            return False
+
         self.model_loaded = True
 
         self.model_status_published = False
@@ -194,6 +196,8 @@ class WindTurbine(object):
 
         # minimal buffer length for denoising. We need to accumulate some sample before denoising
         self.min_num_samples = 500
+
+        return True
 
     def unload_model(self, model_name):
         logging.info("windturbine:unload_model {}".format(model_name))

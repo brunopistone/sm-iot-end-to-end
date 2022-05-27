@@ -1,3 +1,5 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Digital Twin Template
 Parameters:
   AmazonSageMakerEdgeDeviceFleetPolicyArn:
     Type: String
@@ -24,7 +26,7 @@ Parameters:
 
   ThingGroupName:
     Type: String
-    Description: IoT Thing Group Name of the Wind Turbines
+    Description: IoT Thing Group Name
 
 Conditions:
   S3BucketMLEmpty: !Equals
@@ -507,14 +509,17 @@ Resources:
 
   ### IoT Things representing each device ###
 
-  Thing0:
+  IoTThing0:
     Type: AWS::IoT::Thing
     Properties:
       ThingName: edge-device-0
-  Thing1:
+
+  IoTThing1:
     Type: AWS::IoT::Thing
     Properties:
       ThingName: edge-device-1
+
+  ### SageMaker Edge Manager
 
   EdgeDeviceFleet:
     Type: AWS::SageMaker::DeviceFleet
@@ -533,3 +538,21 @@ Resources:
               - 'data'
               - 'iot'
       RoleArn: !GetAtt WindTurbineFarmRole.Arn
+
+  EdgeDeviceSM0:
+    Type: AWS::SageMaker::Device
+    Properties:
+      Device:
+        Description: edge-device-0
+        DeviceName: edge-device-0
+        IotThingName: !Ref IoTThing0
+      DeviceFleetName: !Ref EdgeDeviceFleet
+
+  EdgeDeviceSM1:
+    Type: AWS::SageMaker::Device
+    Properties:
+      Device:
+        Description: edge-device-1
+        DeviceName: edge-device-1
+        IotThingName: !Ref IoTThing1
+      DeviceFleetName: !Sub wind-turbine-farm-${DeviceFleetSuffix}

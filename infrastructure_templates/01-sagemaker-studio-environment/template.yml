@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: SageMaker Studio Module
+Description: SageMaker Studio Environment
 Mappings:
   RegionMap:
     us-east-1:
