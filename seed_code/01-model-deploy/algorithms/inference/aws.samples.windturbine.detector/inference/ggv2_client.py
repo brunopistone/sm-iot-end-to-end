@@ -1,4 +1,3 @@
-# SPDX-License-Identifier: MIT-0
 from threading import Thread
 from typing import Callable
 from awsiot.greengrasscoreipc import connect

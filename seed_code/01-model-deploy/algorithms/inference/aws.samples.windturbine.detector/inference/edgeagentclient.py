@@ -1,5 +1,3 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: MIT-0
 import grpc
 import logging
 import agent_pb2 as agent

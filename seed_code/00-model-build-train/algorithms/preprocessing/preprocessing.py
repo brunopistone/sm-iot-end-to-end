@@ -1,14 +1,11 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: MIT-0
 import sys
 import subprocess
+
 # we need a special package for cleaning our data, lets pip install it first
 subprocess.check_call([sys.executable, "-m", "pip", "install", "pywavelets==1.1.1"])
 
 import argparse
 import os
-import warnings
-
 import pandas as pd
 import numpy as np
 import pywt
