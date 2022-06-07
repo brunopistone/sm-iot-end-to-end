@@ -294,6 +294,20 @@ def setup_agent(agent_id, bucket_name, device_fleet_suffix, region, thing_group_
     # register the device in the fleet
     # the device name needs to have 36 chars
     dev_name = "edge-device-%d" % agent_id
+    dev = [{'DeviceName': dev_name, 'IotThingName': dev_name}]
+
+    try:
+        sm_client.describe_device(DeviceFleetName=fleet_name, DeviceName=dev_name)
+        LOGGER.info("Device was already registered on SageMaker Edge Manager")
+    except ClientError as e:
+        if e.response['Error']['Code'] != 'ValidationException':
+            stacktrace = traceback.format_exc()
+            LOGGER.error(stacktrace)
+
+            raise e
+
+        LOGGER.info("Registering a new device %s on fleet %s" % (dev_name, fleet_name))
+        sm_client.register_devices(DeviceFleetName=fleet_name, Devices=dev)
 
     """
         Check if Thing is added to thing group

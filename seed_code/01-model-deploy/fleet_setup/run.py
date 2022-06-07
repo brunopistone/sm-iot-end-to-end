@@ -9,6 +9,7 @@ import requests
 import shutil
 import stat
 import tarfile
+import traceback
 
 logger = logging.getLogger(__name__)
 
@@ -30,6 +31,20 @@ def setup_agent(agent_id, args, thing_group_name, thing_group_arn):
     # register the device in the fleet    
     # the device name needs to have 36 chars
     dev_name = "edge-device-%d" % agent_id
+    dev = [{'DeviceName': dev_name, 'IotThingName': dev_name}]
+
+    try:
+        sm_client.describe_device(DeviceFleetName=fleet_name, DeviceName=dev_name)
+        logger.info("Device was already registered on SageMaker Edge Manager")
+    except ClientError as e:
+        if e.response['Error']['Code'] != 'ValidationException':
+            stacktrace = traceback.format_exc()
+            logger.error(stacktrace)
+
+            raise e
+
+        logger.info("Registering a new device %s on fleet %s" % (dev_name, fleet_name))
+        sm_client.register_devices(DeviceFleetName=fleet_name, Devices=dev)
 
     """
         Check if Thing is added to thing group
@@ -42,16 +57,16 @@ def setup_agent(agent_id, args, thing_group_name, thing_group_arn):
     logger.info("List thins per agent edge-device-{}".format(agent_id))
     logger.info(response)
 
-    found = False
+    found_thing = False
 
     if "thingGroups" in response and len(response["thingGroups"]) > 0:
         for group in response["thingGroups"]:
             if group["groupName"] == thing_group_name:
                 logger.info("Agent edge-device-{} already in the group {}".format(agent_id, thing_group_name))
-                found = True
+                found_thing = True
                 break
 
-    if not found:
+    if not found_thing:
         logger.info("Adding agent edge-device-{} to group {}".format(agent_id, thing_group_name))
 
         iot_client.add_thing_to_thing_group(
