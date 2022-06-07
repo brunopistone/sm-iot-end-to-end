@@ -35,6 +35,7 @@ class WindTurbine(object):
 
     def __del__(self):
         """Destructor"""
+        self.unload_model("detector")
         self.halt()
 
     def __data_handler__(self, topic, payload):

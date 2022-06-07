@@ -39,9 +39,11 @@ if __name__ == "__main__":
         turbine.start()
     else:
         while turbine.tentative < 5:
+            log.info("Model not loaded. Tentative {} after 30 seconds".format(turbine.tentative + 1))
             turbine.unload_model('detector')
 
             turbine.load_model(args.model_path, 'detector')
             time.sleep(30)
 
+        log.error("Loading model failed. Exiting")
         sys.exit(1)

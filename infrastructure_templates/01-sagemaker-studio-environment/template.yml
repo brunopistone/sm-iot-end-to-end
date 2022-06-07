@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: SageMaker Studio Environment
+Description: SageMaker Studio Module
 Mappings:
   RegionMap:
     us-east-1:
@@ -121,11 +121,6 @@ Resources:
 
   DefaultPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
-    Metadata:
-      cfn_nag:
-        rules_to_suppress:
-          - id: F40
-            reason: "PassRole required for passing role to studio resources by role"
     Properties:
       PolicyDocument:
         Version: 2012-10-17
@@ -162,6 +157,14 @@ Resources:
               - 'ec2:DescribeVpcEndpoints'
               - 'ec2:DescribeVpcs'
               - 'elastic-inference:Connect'
+              - 'elasticmapreduce:CreatePersistentAppUI'
+              - 'elasticmapreduce:DescribeCluster'
+              - 'elasticmapreduce:DescribePersistentAppUI'
+              - 'elasticmapreduce:DescribeSecurityConfiguration'
+              - 'elasticmapreduce:ListClusters'
+              - 'elasticmapreduce:ListInstances'
+              - 'elasticmapreduce:GetPersistentAppUIPresignedURL'
+              - 'elasticmapreduce:GetOnClusterAppUIPresignedURL'
               - 'iam:GetRole'
               - 'iam:ListRoles'
               - 'iam:PassRole'
@@ -174,7 +177,31 @@ Resources:
               - 'logs:PutLogEvents'
               - 'sts:AssumeRole'
             Resource: '*'
+          - Sid: SageMakerBasePolicy2
+            Effect: Allow
+            Action:
+              - 'elasticmapreduce:DescribeCluster'
+              - 'elasticmapreduce:ListInstanceGroups'
+            Resource: !Sub "arn:${AWS::Partition}:elasticmapreduce:*:*:cluster/*"
 
+  KMSPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action:
+              - "kms:CreateGrant"
+              - "kms:Decrypt"
+              - "kms:DescribeKey"
+              - "kms:Encrypt"
+              - "kms:ReEncrypt*"
+              - "kms:GenerateDataKey"
+              - "kms:ListKeys"
+              - "kms:ListAliases"
+            Resource:
+              - "*"
   S3Policy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
@@ -197,7 +224,6 @@ Resources:
               - 's3:ListBucket'
             Resource:
               - '*'
-
   ServicesPolicy:
     Type: 'AWS::IAM::ManagedPolicy'
     Properties:
@@ -209,12 +235,12 @@ Resources:
               - 'cloudformation:*'
               - 'cloudwatch:*'
               - 'codecommit:*'
+              - 'codebuild:*'
               - 'ecr:*'
               - 'greengrass:*'
               - 'iot:*'
               - 'lambda:*'
               - 'logs:*'
-              - 'glue:*'
               - 'sagemaker:*'
               - 'servicecatalog:*'
               - 'ssm:*'
@@ -238,11 +264,13 @@ Resources:
             Principal:
               Service:
                 - cloudformation.amazonaws.com
+                - codebuild.amazonaws.com
                 - lambda.amazonaws.com
                 - sagemaker.amazonaws.com
       Path: /
       ManagedPolicyArns:
         - !Ref DefaultPolicy
+        - !Ref KMSPolicy
         - !Ref S3Policy
         - !Ref ServicesPolicy
 
